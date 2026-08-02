@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>סל קניות | הדפסות תלת מימד - בן דפנה</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">🖨️ <span>הדפסות תלת מימד</span> - בן דפנה</a>
+      <nav class="nav">
+        <a href="index.html">חנות</a>
+        <a href="about.html">אודות</a>
+        <a href="contact.html">צור קשר</a>
+        <a href="cart.html" class="cart-btn active">
+          🛒 סל
+          <span class="cart-count">0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <h1 class="page-title">סל הקניות</h1>
+    <p class="page-subtitle">בדוק את הפריטים לפני המעבר לתשלום</p>
+
+    <div id="cart-content">
+      <!-- תוכן הסל נטען כאן -->
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 בן דפנה | הדפסות תלת מימד</p>
+    <p>
+      <a href="tel:0542319539">054-2319539</a> · 
+      <a href="mailto:bendafna2014@gmail.com">bendafna2014@gmail.com</a> · 
+      <a href="https://wa.me/972542319539" target="_blank">וואטסאפ</a>
+    </p>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    function renderCart() {
+      const cart = getCart();
+      const container = document.getElementById('cart-content');
+      const settings = getSettings();
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="cart-empty">
+            <h2>הסל ריק</h2>
+            <p>עדיין לא הוספת מוצרים. עבור לחנות והתחל לקנות!</p>
+            <a href="index.html" class="btn btn-primary">לחנות</a>
+          </div>`;
+        return;
+      }
+
+      const subtotal = getCartTotal();
+      const shipping = settings.shippingCost || 0;
+      const total = subtotal + shipping;
+
+      let itemsHtml = cart.map(item => `
+        <div class="cart-item">
+          <img src="${item.image}" alt="${item.name}"
+               onerror="this.src='https://placehold.co/90x90/e5e7eb/9ca3af?text=תמונה'">
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">${item.price} ₪ ליחידה</div>
+          </div>
+          <div class="cart-item-actions">
+            <div class="qty-control">
+              <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+              <span class="qty-value">${item.quantity}</span>
+              <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+            </div>
+            <strong>${item.price * item.quantity} ₪</strong>
+            <button class="btn btn-outline btn-sm" onclick="removeItem(${item.id})" title="הסר">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = `
+        <div class="cart-items">${itemsHtml}</div>
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>סכום ביניים</span>
+            <span>${subtotal} ₪</span>
+          </div>
+          <div class="summary-row">
+            <span>משלוח</span>
+            <span>${shipping === 0 ? 'חינם / איסוף' : shipping + ' ₪'}</span>
+          </div>
+          <div class="summary-row total">
+            <span>סה״כ לתשלום</span>
+            <span>${total} ₪</span>
+          </div>
+          <a href="checkout.html" class="btn btn-primary btn-block" style="margin-top: 20px;">
+            המשך להזמנה ←
+          </a>
+          <button class="btn btn-outline btn-block" style="margin-top: 10px;" onclick="if(confirm('לרוקן את הסל?')){clearCart();renderCart();}">
+            רוקן סל
+          </button>
+        </div>
+      `;
+    }
+
+    function changeQty(id, delta) {
+      const cart = getCart();
+      const item = cart.find(i => i.id === id);
+      if (item) {
+        updateQuantity(id, item.quantity + delta);
+        renderCart();
+      }
+    }
+
+    function removeItem(id) {
+      removeFromCart(id);
+      renderCart();
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCart);
+  </script>
+</body>
+</html>

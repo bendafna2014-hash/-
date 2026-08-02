@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>השלמת הזמנה | הדפסות תלת מימד - בן דפנה</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">🖨️ <span>הדפסות תלת מימד</span> - בן דפנה</a>
+      <nav class="nav">
+        <a href="index.html">חנות</a>
+        <a href="about.html">אודות</a>
+        <a href="contact.html">צור קשר</a>
+        <a href="cart.html" class="cart-btn">
+          🛒 סל
+          <span class="cart-count">0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <h1 class="page-title">השלמת הזמנה</h1>
+    <p class="page-subtitle">מלא את הפרטים ואשלח אליך את ההזמנה בוואטסאפ או במייל</p>
+
+    <div id="checkout-content">
+      <!-- נטען דינמית -->
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 בן דפנה | הדפסות תלת מימד</p>
+    <p>
+      <a href="tel:0542319539">054-2319539</a> · 
+      <a href="mailto:bendafna2014@gmail.com">bendafna2014@gmail.com</a> · 
+      <a href="https://wa.me/972542319539" target="_blank">וואטסאפ</a>
+    </p>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    function renderCheckout() {
+      const cart = getCart();
+      const container = document.getElementById('checkout-content');
+      const settings = getSettings();
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="cart-empty">
+            <h2>אין פריטים בסל</h2>
+            <p>חזור לחנות והוסף מוצרים לפני ההזמנה.</p>
+            <a href="index.html" class="btn btn-primary">לחנות</a>
+          </div>`;
+        return;
+      }
+
+      const subtotal = getCartTotal();
+      const shipping = settings.shippingCost || 0;
+      const total = subtotal + shipping;
+
+      const itemsList = cart.map(i => `• ${i.name} × ${i.quantity} = ${i.price * i.quantity} ₪`).join('\n');
+
+      container.innerHTML = `
+        <div class="checkout-grid">
+          <div class="form-card">
+            <h2 style="margin-bottom: 20px; font-size: 1.3rem;">פרטי הלקוח</h2>
+            <form id="order-form" onsubmit="return false;">
+              <div class="form-group">
+                <label>שם מלא <span class="required">*</span></label>
+                <input type="text" id="customer-name" required placeholder="ישראל ישראלי">
+              </div>
+              <div class="form-group">
+                <label>מספר טלפון <span class="required">*</span></label>
+                <input type="tel" id="customer-phone" required placeholder="050-0000000" dir="ltr">
+              </div>
+              <div class="form-group">
+                <label>כתובת מייל</label>
+                <input type="email" id="customer-email" placeholder="name@email.com" dir="ltr">
+              </div>
+              <div class="form-group">
+                <label>כתובת למשלוח (אם רלוונטי)</label>
+                <input type="text" id="customer-address" placeholder="רחוב, עיר, מיקוד">
+              </div>
+              <div class="form-group">
+                <label>הערות להזמנה</label>
+                <textarea id="customer-notes" placeholder="צבע מועדף, בקשות מיוחדות..."></textarea>
+              </div>
+            </form>
+          </div>
+
+          <div class="summary-card">
+            <h2 style="margin-bottom: 16px; font-size: 1.2rem;">סיכום הזמנה</h2>
+            <div style="margin-bottom: 16px; font-size: 0.95rem; color: var(--text-light); white-space: pre-line;">${itemsList}</div>
+            <div class="summary-row">
+              <span>סכום ביניים</span>
+              <span>${subtotal} ₪</span>
+            </div>
+            <div class="summary-row">
+              <span>משלוח</span>
+              <span>${shipping === 0 ? 'חינם / איסוף' : shipping + ' ₪'}</span>
+            </div>
+            <div class="summary-row total">
+              <span>סה״כ</span>
+              <span>${total} ₪</span>
+            </div>
+
+            <div class="checkout-actions">
+              <button class="btn btn-whatsapp btn-block" onclick="sendWhatsApp()">
+                📱 שלח הזמנה בוואטסאפ
+              </button>
+              <button class="btn btn-primary btn-block" onclick="sendEmail()">
+                ✉️ שלח הזמנה במייל
+              </button>
+              <a href="cart.html" class="btn btn-outline btn-block">← חזרה לסל</a>
+            </div>
+
+            <p style="margin-top: 18px; font-size: 0.85rem; color: var(--text-light); text-align: center;">
+              לאחר השליחה אחזור אליך לתיאום תשלום ומשלוח.
+            </p>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildOrderMessage() {
+      const name = document.getElementById('customer-name').value.trim();
+      const phone = document.getElementById('customer-phone').value.trim();
+      const email = document.getElementById('customer-email').value.trim();
+      const address = document.getElementById('customer-address').value.trim();
+      const notes = document.getElementById('customer-notes').value.trim();
+
+      if (!name || !phone) {
+        alert('נא למלא שם מלא ומספר טלפון');
+        return null;
+      }
+
+      const cart = getCart();
+      const settings = getSettings();
+      const subtotal = getCartTotal();
+      const shipping = settings.shippingCost || 0;
+      const total = subtotal + shipping;
+
+      let msg = `🛒 *הזמנה חדשה מאתר ההדפסות*\n\n`;
+      msg += `👤 *שם:* ${name}\n`;
+      msg += `📞 *טלפון:* ${phone}\n`;
+      if (email) msg += `✉️ *מייל:* ${email}\n`;
+      if (address) msg += `📍 *כתובת:* ${address}\n`;
+      if (notes) msg += `📝 *הערות:* ${notes}\n`;
+      msg += `\n*פרטי ההזמנה:*\n`;
+      cart.forEach(item => {
+        msg += `• ${item.name} × ${item.quantity} = ${item.price * item.quantity} ₪\n`;
+      });
+      msg += `\nסכום ביניים: ${subtotal} ₪\n`;
+      msg += `משלוח: ${shipping === 0 ? 'חינם / איסוף' : shipping + ' ₪'}\n`;
+      msg += `*סה״כ לתשלום: ${total} ₪*`;
+
+      return msg;
+    }
+
+    function sendWhatsApp() {
+      const msg = buildOrderMessage();
+      if (!msg) return;
+
+      const settings = getSettings();
+      const url = `https://wa.me/${settings.whatsappNumber}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+
+      // אופציונלי: לנקות סל אחרי שליחה
+      // clearCart();
+      showToast('נפתח וואטסאפ – שלח את ההודעה!');
+    }
+
+    function sendEmail() {
+      const msg = buildOrderMessage();
+      if (!msg) return;
+
+      const settings = getSettings();
+      const subject = encodeURIComponent('הזמנה חדשה מאתר ההדפסות - בן דפנה');
+      const body = encodeURIComponent(msg.replace(/\*/g, ''));
+      const url = `mailto:${settings.email}?subject=${subject}&body=${body}`;
+      window.location.href = url;
+
+      showToast('נפתח המייל – שלח את ההודעה!');
+    }
+
+    document.addEventListener('DOMContentLoaded', renderCheckout);
+  </script>
+</body>
+</html>

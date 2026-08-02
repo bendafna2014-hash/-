@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ניהול האתר | הדפסות תלת מימד - בן דפנה</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">🖨️ <span>הדפסות תלת מימד</span> - בן דפנה</a>
+      <nav class="nav">
+        <a href="index.html">חנות</a>
+        <a href="about.html">אודות</a>
+        <a href="contact.html">צור קשר</a>
+        <a href="cart.html" class="cart-btn">
+          🛒 סל
+          <span class="cart-count">0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <h1 class="page-title">דף ניהול</h1>
+    <p class="page-subtitle">כאן אתה יכול לנהל מוצרים והגדרות (נשמר בדפדפן שלך)</p>
+
+    <!-- מסך כניסה -->
+    <div class="admin-login" id="login-box">
+      <h2 style="margin-bottom: 20px;">כניסה למערכת</h2>
+      <div class="form-group">
+        <label>סיסמה</label>
+        <input type="password" id="admin-password" placeholder="הכנס סיסמה" style="text-align: center;">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="tryLogin()">כניסה</button>
+      <p style="margin-top: 16px; font-size: 0.85rem; color: var(--text-light);">
+        הסיסמה הראשונית: <strong>1234</strong><br>
+        (אפשר לשנות אותה בקוד אחר כך)
+      </p>
+    </div>
+
+    <!-- פאנל ניהול -->
+    <div class="admin-panel" id="admin-panel">
+      <div class="alert alert-warning">
+        <strong>חשוב לדעת:</strong> השינויים נשמרים רק בדפדפן שלך (localStorage). 
+        כדי שהמוצרים יופיעו לכולם באתר הציבורי – צריך לערוך את הקובץ <code>js/products.js</code> ולהעלות מחדש.
+        אפשר גם לייצא את המוצרים מכאן ולהעתיק אותם לקובץ.
+      </div>
+
+      <!-- הגדרות כלליות -->
+      <div class="admin-section">
+        <h3>⚙️ הגדרות כלליות</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>עלות משלוח (₪) – 0 = חינם / איסוף</label>
+            <input type="number" id="setting-shipping" min="0" value="25">
+          </div>
+          <div class="form-group">
+            <label>מספר וואטסאפ (עם קידומת מדינה)</label>
+            <input type="text" id="setting-whatsapp" dir="ltr" value="972542319539">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>כתובת מייל לקבלת הזמנות</label>
+            <input type="email" id="setting-email" dir="ltr" value="bendafna2014@gmail.com">
+          </div>
+          <div class="form-group">
+            <label>שם החנות</label>
+            <input type="text" id="setting-shopname" value="הדפסות תלת מימד - בן דפנה">
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="saveSettingsFromForm()">שמור הגדרות</button>
+      </div>
+
+      <!-- הוספת מוצר -->
+      <div class="admin-section">
+        <h3>➕ הוסף מוצר חדש</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>שם המוצר</label>
+            <input type="text" id="new-name" placeholder="לדוגמה: מעמד טלפון">
+          </div>
+          <div class="form-group">
+            <label>מחיר (₪)</label>
+            <input type="number" id="new-price" min="0" placeholder="45">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>תיאור קצר</label>
+          <textarea id="new-desc" placeholder="תיאור המוצר..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>קישור לתמונה (URL)</label>
+            <input type="url" id="new-image" dir="ltr" placeholder="https://...">
+          </div>
+          <div class="form-group">
+            <label>קטגוריה</label>
+            <input type="text" id="new-category" placeholder="שימושי / קישוט / מתנות">
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="addProduct()">הוסף מוצר</button>
+      </div>
+
+      <!-- רשימת מוצרים -->
+      <div class="admin-section">
+        <h3>📦 המוצרים הקיימים</h3>
+        <div class="admin-product-list" id="admin-products">
+          <!-- נטען דינמית -->
+        </div>
+      </div>
+
+      <!-- ייצוא / איפוס -->
+      <div class="admin-section">
+        <h3>💾 ייצוא ואיפוס</h3>
+        <p style="margin-bottom: 14px; color: var(--text-light); font-size: 0.95rem;">
+          ייצא את המוצרים כקוד JavaScript מוכן להעתקה לקובץ products.js
+        </p>
+        <button class="btn btn-primary" onclick="exportProducts()">העתק קוד מוצרים</button>
+        <button class="btn btn-outline" onclick="resetToDefault()" style="margin-right: 10px;">אפס לברירת מחדל</button>
+        <button class="btn btn-danger" onclick="logout()" style="margin-right: 10px;">יציאה</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 בן דפנה | הדפסות תלת מימד</p>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/cart.js"></script>
+  <script>
+    const ADMIN_PASSWORD = "1234"; // שנה כאן את הסיסמה אם תרצה
+
+    function tryLogin() {
+      const pass = document.getElementById('admin-password').value;
+      if (pass === ADMIN_PASSWORD) {
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('admin-panel').classList.add('visible');
+        loadAdminData();
+        sessionStorage.setItem('ben_admin_logged', '1');
+      } else {
+        alert('סיסמה שגויה');
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('ben_admin_logged');
+      location.reload();
+    }
+
+    // בדיקה אם כבר מחובר
+    if (sessionStorage.getItem('ben_admin_logged') === '1') {
+      document.getElementById('login-box').style.display = 'none';
+      document.getElementById('admin-panel').classList.add('visible');
+    }
+
+    function loadAdminData() {
+      const settings = getSettings();
+      document.getElementById('setting-shipping').value = settings.shippingCost;
+      document.getElementById('setting-whatsapp').value = settings.whatsappNumber;
+      document.getElementById('setting-email').value = settings.email;
+      document.getElementById('setting-shopname').value = settings.shopName;
+
+      renderAdminProducts();
+    }
+
+    function saveSettingsFromForm() {
+      const settings = {
+        shippingCost: Number(document.getElementById('setting-shipping').value) || 0,
+        whatsappNumber: document.getElementById('setting-whatsapp').value.trim(),
+        email: document.getElementById('setting-email').value.trim(),
+        shopName: document.getElementById('setting-shopname').value.trim(),
+        ownerName: "בן דפנה",
+        currency: "₪"
+      };
+      saveSettings(settings);
+      showToast('ההגדרות נשמרו!');
+    }
+
+    function renderAdminProducts() {
+      const products = getProducts();
+      const list = document.getElementById('admin-products');
+
+      if (products.length === 0) {
+        list.innerHTML = '<p style="color: var(--text-light);">אין מוצרים עדיין.</p>';
+        return;
+      }
+
+      list.innerHTML = products.map(p => `
+        <div class="admin-product-item">
+          <img src="${p.image}" alt="" onerror="this.src='https://placehold.co/60x60/e5e7eb/9ca3af?text=?'">
+          <div class="info">
+            <strong>${p.name}</strong><br>
+            <span style="color: var(--text-light); font-size: 0.9rem;">${p.price} ₪ · ${p.category || 'כללי'}</span>
+          </div>
+          <div class="actions">
+            <button class="btn btn-outline btn-sm" onclick="editProduct(${p.id})">ערוך</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">מחק</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addProduct() {
+      const name = document.getElementById('new-name').value.trim();
+      const price = Number(document.getElementById('new-price').value);
+      const description = document.getElementById('new-desc').value.trim();
+      const image = document.getElementById('new-image').value.trim() || 'https://placehold.co/400x400/e5e7eb/9ca3af?text=מוצר';
+      const category = document.getElementById('new-category').value.trim() || 'כללי';
+
+      if (!name || !price) {
+        alert('נא למלא שם ומחיר');
+        return;
+      }
+
+      const products = getProducts();
+      const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+
+      products.push({ id: newId, name, price, description, image, category });
+      saveProducts(products);
+
+      // ניקוי הטופס
+      document.getElementById('new-name').value = '';
+      document.getElementById('new-price').value = '';
+      document.getElementById('new-desc').value = '';
+      document.getElementById('new-image').value = '';
+      document.getElementById('new-category').value = '';
+
+      renderAdminProducts();
+      showToast('המוצר נוסף!');
+    }
+
+    function deleteProduct(id) {
+      if (!confirm('למחוק את המוצר?')) return;
+      let products = getProducts();
+      products = products.filter(p => p.id !== id);
+      saveProducts(products);
+      renderAdminProducts();
+      showToast('המוצר נמחק');
+    }
+
+    function editProduct(id) {
+      const products = getProducts();
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+
+      const newName = prompt('שם חדש:', p.name);
+      if (newName === null) return;
+      const newPrice = prompt('מחיר חדש:', p.price);
+      if (newPrice === null) return;
+      const newDesc = prompt('תיאור חדש:', p.description);
+      if (newDesc === null) return;
+      const newImage = prompt('קישור תמונה חדש:', p.image);
+      if (newImage === null) return;
+      const newCat = prompt('קטגוריה חדשה:', p.category || '');
+      if (newCat === null) return;
+
+      p.name = newName.trim() || p.name;
+      p.price = Number(newPrice) || p.price;
+      p.description = newDesc.trim();
+      p.image = newImage.trim() || p.image;
+      p.category = newCat.trim();
+
+      saveProducts(products);
+      renderAdminProducts();
+      showToast('המוצר עודכן');
+    }
+
+    function exportProducts() {
+      const products = getProducts();
+      const code = `const DEFAULT_PRODUCTS = ${JSON.stringify(products, null, 2)};`;
+      
+      navigator.clipboard.writeText(code).then(() => {
+        alert('הקוד הועתק ללוח!\n\nפתח את הקובץ js/products.js\nהחלף את המערך DEFAULT_PRODUCTS בתוכן שהועתק\nשמור והעלה מחדש את האתר.');
+      }).catch(() => {
+        // fallback
+        prompt('העתק את הקוד הבא:', code);
+      });
+    }
+
+    function resetToDefault() {
+      if (!confirm('לאפס את כל המוצרים לברירת המחדל?')) return;
+      localStorage.removeItem('ben_3d_products');
+      localStorage.removeItem('ben_3d_settings');
+      loadAdminData();
+      showToast('אופס לברירת מחדל');
+    }
+
+    // Enter key for login
+    document.getElementById('admin-password')?.addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') tryLogin();
+    });
+
+    if (sessionStorage.getItem('ben_admin_logged') === '1') {
+      loadAdminData();
+    }
+  </script>
+</body>
+</html>
