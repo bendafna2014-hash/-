@@ -1,96 +1,98 @@
 // ============================================
-// ניהול סל הקניות (localStorage)
+// קובץ המוצרים - כאן אתה מוסיף / משנה / מוחק מוצרים
+// אחרי שינוי: שמור את הקובץ והעלה מחדש לאתר
 // ============================================
 
-function getCart() {
-  const cart = localStorage.getItem('ben_3d_cart');
-  return cart ? JSON.parse(cart) : [];
-}
-
-function saveCart(cart) {
-  localStorage.setItem('ben_3d_cart', JSON.stringify(cart));
-  updateCartCount();
-}
-
-function addToCart(productId, quantity = 1) {
-  const products = getProducts();
-  const product = products.find(p => p.id === productId);
-  if (!product) return;
-
-  let cart = getCart();
-  const existing = cart.find(item => item.id === productId);
-
-  if (existing) {
-    existing.quantity += quantity;
-  } else {
-    cart.push({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image,
-      quantity: quantity
-    });
+const DEFAULT_PRODUCTS = [
+  {
+    id: 1,
+    name: "מעמד טלפון ארגונומי",
+    price: 45,
+    description: "מעמד מודפס בתלת מימד יציב ונוח לטלפון. מתאים לכל הגדלים. צבע לפי בחירה.",
+    image: "https://placehold.co/400x400/1a1a2e/ffffff?text=מעמד+טלפון",
+    category: "שימושי"
+  },
+  {
+    id: 2,
+    name: "קופסת אחסון קטנה",
+    price: 35,
+    description: "קופסה מודפסת עם מכסה. מושלמת לאחסון ברגים, תכשיטים או חפצים קטנים.",
+    image: "https://placehold.co/400x400/16213e/ffffff?text=קופסת+אחסון",
+    category: "שימושי"
+  },
+  {
+    id: 3,
+    name: "עציץ גיאומטרי",
+    price: 55,
+    description: "עציץ בעיצוב מודרני גיאומטרי. מתאים לצמחים קטנים או כקישוט שולחן.",
+    image: "https://placehold.co/400x400/0f3460/ffffff?text=עציץ+גיאומטרי",
+    category: "קישוט"
+  },
+  {
+    id: 4,
+    name: "מחזיק מפתחות מותאם",
+    price: 25,
+    description: "מחזיק מפתחות מודפס עם אפשרות להוסיף שם או לוגו. עמיד וקל.",
+    image: "https://placehold.co/400x400/533483/ffffff?text=מחזיק+מפתחות",
+    category: "מתנות"
+  },
+  {
+    id: 5,
+    name: "סטנד לאוזניות",
+    price: 40,
+    description: "סטנד יפה ומסודר לאוזניות. שומר על הצורה ומונע סבכים.",
+    image: "https://placehold.co/400x400/e94560/ffffff?text=סטנד+אוזניות",
+    category: "שימושי"
+  },
+  {
+    id: 6,
+    name: "דמות קטנה מותאמת אישית",
+    price: 70,
+    description: "דמות קטנה מודפסת לפי בקשה. שלח תמונה או רעיון ואדפיס במיוחד בשבילך.",
+    image: "https://placehold.co/400x400/1a1a2e/ffffff?text=דמות+מותאמת",
+    category: "מתנות"
   }
+];
 
-  saveCart(cart);
-  showToast(`נוסף לסל: ${product.name}`);
-}
-
-function removeFromCart(productId) {
-  let cart = getCart();
-  cart = cart.filter(item => item.id !== productId);
-  saveCart(cart);
-}
-
-function updateQuantity(productId, quantity) {
-  let cart = getCart();
-  const item = cart.find(i => i.id === productId);
-  if (item) {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-    } else {
-      item.quantity = quantity;
-      saveCart(cart);
+// טעינת מוצרים (אם יש ב-localStorage משתמש בזה, אחרת בברירת המחדל)
+function getProducts() {
+  const saved = localStorage.getItem('ben_3d_products');
+  if (saved) {
+    try {
+      return JSON.parse(saved);
+    } catch (e) {
+      return DEFAULT_PRODUCTS;
     }
   }
+  return DEFAULT_PRODUCTS;
 }
 
-function getCartTotal() {
-  const cart = getCart();
-  return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+function saveProducts(products) {
+  localStorage.setItem('ben_3d_products', JSON.stringify(products));
 }
 
-function getCartCount() {
-  const cart = getCart();
-  return cart.reduce((sum, item) => sum + item.quantity, 0);
-}
+// הגדרות כלליות (משלוח, וואטסאפ וכו')
+const DEFAULT_SETTINGS = {
+  shippingCost: 25,          // עלות משלוח בשקלים (0 = חינם / איסוף)
+  whatsappNumber: "972542319539",
+  email: "bendafna2014@gmail.com",
+  ownerName: "בן דפנה",
+  shopName: "הדפסות תלת מימד - בן דפנה",
+  currency: "₪"
+};
 
-function clearCart() {
-  localStorage.removeItem('ben_3d_cart');
-  updateCartCount();
-}
-
-function updateCartCount() {
-  const countEls = document.querySelectorAll('.cart-count');
-  const count = getCartCount();
-  countEls.forEach(el => {
-    el.textContent = count;
-    el.style.display = count > 0 ? 'inline-flex' : 'none';
-  });
-}
-
-// הודעה קטנה (toast)
-function showToast(message) {
-  let toast = document.getElementById('toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'toast';
-    document.body.appendChild(toast);
+function getSettings() {
+  const saved = localStorage.getItem('ben_3d_settings');
+  if (saved) {
+    try {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+    } catch (e) {
+      return DEFAULT_SETTINGS;
+    }
   }
-  toast.textContent = message;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2500);
+  return DEFAULT_SETTINGS;
 }
 
-// עדכון מספר הפריטים בסל בכל טעינת דף
-document.addEventListener('DOMContentLoaded', updateCartCount);
+function saveSettings(settings) {
+  localStorage.setItem('ben_3d_settings', JSON.stringify(settings));
+}

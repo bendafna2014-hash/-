@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>צור קשר | הדפסות תלת מימד - בן דפנה</title>
-  <link rel="stylesheet" href="css/style.css">
+  <title>הדפסות תלת מימד - בן דפנה</title>
+  <meta name="description" content="הדפסות תלת מימד איכותיות בהזמנה אישית - בן דפנה">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">🖨️ <span>הדפסות תלת מימד</span> - בן דפנה</a>
       <nav class="nav">
-        <a href="index.html">חנות</a>
+        <a href="index.html" class="active">חנות</a>
         <a href="about.html">אודות</a>
-        <a href="contact.html" class="active">צור קשר</a>
+        <a href="contact.html">צור קשר</a>
+        <a href="https://wa.me/972542319539" target="_blank" class="whatsapp-btn">📱 וואטסאפ</a>
+        <a href="admin.html" class="btn btn-outline" style="padding:8px 14px;border-radius:50px;font-weight:600;">כניסה</a>
         <a href="cart.html" class="cart-btn">
           🛒 סל
           <span class="cart-count">0</span>
@@ -23,43 +26,11 @@
   </header>
 
   <main class="main">
-    <h1 class="page-title">צור קשר</h1>
-    <p class="page-subtitle">אשמח לשמוע ממך – שאלות, הזמנות מיוחדות או סתם להגיד שלום</p>
+    <h1 class="page-title">החנות</h1>
+    <p class="page-subtitle">הדפסות תלת מימד איכותיות בהזמנה אישית. כל המוצרים מודפסים בעבודת יד.</p>
 
-    <div class="content-card">
-      <div class="contact-info">
-        <div class="contact-item">
-          <strong>שם:</strong>
-          <span>בן דפנה</span>
-        </div>
-        <div class="contact-item">
-          <strong>טלפון:</strong>
-          <a href="tel:0542319539" dir="ltr">054-2319539</a>
-        </div>
-        <div class="contact-item">
-          <strong>מייל:</strong>
-          <a href="mailto:bendafna2014@gmail.com" dir="ltr">bendafna2014@gmail.com</a>
-        </div>
-        <div class="contact-item">
-          <strong>וואטסאפ:</strong>
-          <a href="https://wa.me/972542319539" target="_blank" dir="ltr">לחץ כאן לפתיחה</a>
-        </div>
-      </div>
-
-      <a href="https://wa.me/972542319539?text=%D7%A9%D7%9C%D7%95%D7%9D%2C%20%D7%90%D7%A0%D7%99%20%D7%9E%D7%A2%D7%95%D7%A0%D7%99%D7%99%D7%9F%20%D7%91%D7%90%D7%AA%D7%A8%20%D7%94%D7%94%D7%93%D7%A4%D7%A1%D7%95%D7%AA" 
-         class="btn btn-whatsapp btn-block" target="_blank" style="max-width: 320px; margin: 20px 0;">
-        📱 שלח הודעה בוואטסאפ
-      </a>
-
-      <div class="qr-section">
-        <h3>סרוק את הברקוד לוואטסאפ</h3>
-        <p style="color: var(--text-light); margin-bottom: 8px;">פתח את המצלמה וסרוק – ייפתח וואטסאפ ישירות אליי</p>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://wa.me/972542319539" 
-             alt="QR Code לוואטסאפ" width="200" height="200">
-        <p style="font-size: 0.85rem; color: var(--text-light); margin-top: 12px;">
-          או שמור את הברקוד ושתף עם חברים
-        </p>
-      </div>
+    <div class="products-grid" id="products-grid">
+      <!-- המוצרים נטענים כאן דינמית -->
     </div>
   </main>
 
@@ -72,7 +43,91 @@
     </p>
   </footer>
 
-  <script src="js/products.js"></script>
-  <script src="js/cart.js"></script>
+  <!-- כפתור כניסה צף בצד המסך -->
+  <button class="side-login-btn" onclick="openLoginModal()">כניסה</button>
+
+  <!-- חלון כניסה -->
+  <div class="login-modal-overlay" id="loginModal">
+    <div class="login-modal">
+      <button class="close-btn" onclick="closeLoginModal()">×</button>
+      <h2>כניסה</h2>
+      <p class="subtitle">הכנס את המייל שלך</p>
+      <div class="form-group">
+        <label>מייל</label>
+        <input type="email" id="login-email" placeholder="name@email.com" dir="ltr" style="text-align:left;">
+      </div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">כניסה</button>
+    </div>
+  </div>
+
+  <script src="products.js"></script>
+  <script src="cart.js"></script>
+  <script>
+    function renderProducts() {
+      const products = getProducts();
+      const grid = document.getElementById('products-grid');
+
+      if (products.length === 0) {
+        grid.innerHTML = `
+          <div class="cart-empty" style="grid-column: 1 / -1;">
+            <h2>עדיין אין מוצרים</h2>
+            <p>היכנס דרך כפתור הכניסה והוסף מוצרים.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = products.map(p => `
+        <div class="product-card">
+          <img src="${p.image}" alt="${p.name}" class="product-image" loading="lazy"
+               onerror="this.src='https://placehold.co/400x400/e5e7eb/9ca3af?text=תמונה'">
+          <div class="product-body">
+            <div class="product-category">${p.category || 'כללי'}</div>
+            <h3 class="product-name">${p.name}</h3>
+            <p class="product-desc">${p.description}</p>
+            <div class="product-footer">
+              <div class="product-price">${p.price} ₪</div>
+              <button class="btn btn-primary btn-sm" onclick="addToCart(${p.id})">
+                + הוסף לסל
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.add('show');
+    }
+
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('show');
+    }
+
+    function doLogin() {
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+
+      // המייל של בעל האתר → חשבון מנהל
+      if (email === 'bendafna2014@gmail.com') {
+        sessionStorage.setItem('ben_admin_logged', '1');
+        window.location.href = 'admin.html';
+        return;
+      }
+
+      // כל מייל אחר → חשבון אורח
+      if (email) {
+        showToast('שלום! נכנסת כחשבון אורח');
+      } else {
+        showToast('שלום אורח!');
+      }
+      closeLoginModal();
+    }
+
+    // סגירה בלחיצה מחוץ לחלון
+    document.getElementById('loginModal').addEventListener('click', function(e) {
+      if (e.target === this) closeLoginModal();
+    });
+
+    document.addEventListener('DOMContentLoaded', renderProducts);
+  </script>
 </body>
 </html>

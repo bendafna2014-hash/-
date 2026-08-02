@@ -1,82 +1,98 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>הדפסות תלת מימד - בן דפנה</title>
-  <meta name="description" content="הדפסות תלת מימד איכותיות בהזמנה אישית - בן דפנה">
-  <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo">🖨️ <span>הדפסות תלת מימד</span> - בן דפנה</a>
-      <nav class="nav">
-        <a href="index.html" class="active">חנות</a>
-        <a href="about.html">אודות</a>
-        <a href="contact.html">צור קשר</a>
-        <a href="cart.html" class="cart-btn">
-          🛒 סל
-          <span class="cart-count">0</span>
-        </a>
-      </nav>
-    </div>
-  </header>
+========================================
+  אתר הדפסות תלת מימד - בן דפנה
+  הוראות מלאות לשימוש ולהעלאה לרשת
+========================================
 
-  <main class="main">
-    <h1 class="page-title">החנות</h1>
-    <p class="page-subtitle">הדפסות תלת מימד איכותיות בהזמנה אישית. כל המוצרים מודפסים בעבודת יד.</p>
+מה יש באתר?
+------------
+• דף חנות עם מוצרים
+• סל קניות
+• דף השלמת הזמנה (שולח לוואטסאפ או למייל שלך)
+• דף אודות
+• דף צור קשר + כפתור וואטסאפ + ברקוד QR
+• דף ניהול (admin) – סיסמה ראשונית: 1234
 
-    <div class="products-grid" id="products-grid">
-      <!-- המוצרים נטענים כאן דינמית -->
-    </div>
-  </main>
+איך לערוך מוצרים?
+-----------------
+יש שתי דרכים:
 
-  <footer class="footer">
-    <p>© 2026 בן דפנה | הדפסות תלת מימד</p>
-    <p>
-      <a href="tel:0542319539">054-2319539</a> · 
-      <a href="mailto:bendafna2014@gmail.com">bendafna2014@gmail.com</a> · 
-      <a href="https://wa.me/972542319539" target="_blank">וואטסאפ</a>
-    </p>
-  </footer>
+1. דרך פשוטה (מומלצת למתחילים):
+   - פתח את הקובץ: js/products.js
+   - שנה / הוסף / מחק מוצרים בתוך המערך DEFAULT_PRODUCTS
+   - שמור את הקובץ
+   - העלה מחדש את התיקייה לאתר
 
-  <script src="js/products.js"></script>
-  <script src="js/cart.js"></script>
-  <script>
-    function renderProducts() {
-      const products = getProducts();
-      const grid = document.getElementById('products-grid');
+2. דרך דף הניהול:
+   - היכנס ל-admin.html
+   - סיסמה: 1234
+   - הוסף/ערוך/מחק מוצרים
+   - לחץ "העתק קוד מוצרים"
+   - הדבק את הקוד בתוך js/products.js במקום המערך הישן
+   - שמור והעלה מחדש
 
-      if (products.length === 0) {
-        grid.innerHTML = `
-          <div class="cart-empty" style="grid-column: 1 / -1;">
-            <h2>עדיין אין מוצרים</h2>
-            <p>היכנס לדף המנהל והוסף מוצרים.</p>
-          </div>`;
-        return;
-      }
+איך לשנות עלות משלוח / מספר וואטסאפ / מייל?
+---------------------------------------------
+בתוך js/products.js יש אובייקט DEFAULT_SETTINGS.
+שנה שם את:
+  shippingCost   → עלות משלוח (0 = חינם)
+  whatsappNumber → 972542319539
+  email          → bendafna2014@gmail.com
 
-      grid.innerHTML = products.map(p => `
-        <div class="product-card">
-          <img src="${p.image}" alt="${p.name}" class="product-image" loading="lazy"
-               onerror="this.src='https://placehold.co/400x400/e5e7eb/9ca3af?text=תמונה'">
-          <div class="product-body">
-            <div class="product-category">${p.category || 'כללי'}</div>
-            <h3 class="product-name">${p.name}</h3>
-            <p class="product-desc">${p.description}</p>
-            <div class="product-footer">
-              <div class="product-price">${p.price} ₪</div>
-              <button class="btn btn-primary btn-sm" onclick="addToCart(${p.id})">
-                + הוסף לסל
-              </button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
+או דרך דף הניהול (ואז ייצא את ההגדרות אם צריך).
 
-    document.addEventListener('DOMContentLoaded', renderProducts);
-  </script>
-</body>
-</html>
+========================================
+  איך להעלות את האתר לאינטרנט (חינם)
+========================================
+
+הדרך הכי קלה למתחילים: Netlify Drop
+
+שלב 1 – הכן את התיקייה
+  וודא שיש לך תיקייה בשם 3d-shop עם כל הקבצים בפנים
+  (index.html, cart.html, admin.html, css/, js/ וכו')
+
+שלב 2 – היכנס לאתר
+  פתח בדפדפן: https://app.netlify.com/drop
+  (אין צורך להירשם בהתחלה)
+
+שלב 3 – גרור את התיקייה
+  פשוט גרור את כל תיקיית 3d-shop לתוך הריבוע באתר
+  תוך כמה שניות תקבל קישור חי (למשל: https://random-name-123.netlify.app)
+
+שלב 4 – שמור את הקישור
+  זה האתר שלך! אפשר לשתף אותו עם כולם.
+
+שלב 5 (מומלץ) – חשבון חינמי
+  כדי שהאתר לא יימחק אחרי זמן, תירשם בחינם ב-Netlify
+  ואז תוכל לשנות את שם האתר לאיזה שם שתרצה
+  (למשל: bendafna-3d.netlify.app)
+
+========================================
+  דרכים נוספות (גם חינמיות)
+========================================
+
+• GitHub Pages – דורש חשבון GitHub + העלאת קבצים
+• Cloudflare Pages – דומה ל-Netlify
+• Vercel – גם פשוט מאוד
+
+Netlify Drop היא הכי קלה למי שזו הפעם הראשונה.
+
+========================================
+  אחרי שהאתר באוויר
+========================================
+
+1. היכנס לדף צור קשר ובדוק שהברקוד עובד
+2. נסה להוסיף מוצר לסל ולשלוח הזמנה בוואטסאפ (תבדוק על עצמך)
+3. שנה את הסיסמה של דף הניהול בקובץ admin.html (חפש ADMIN_PASSWORD)
+4. כשתרצה להוסיף תמונות אמיתיות – העלה אותן לתיקיית images/
+   ואז שנה את הקישור בתמונה של המוצר ל: images/שם-הקובץ.jpg
+
+========================================
+  פרטים שלך שכבר מוזנים באתר
+========================================
+שם:     בן דפנה
+טלפון:  054-2319539
+מייל:   bendafna2014@gmail.com
+וואטסאפ: https://wa.me/972542319539
+
+בהצלחה!
+אם משהו לא ברור – תשאל.
